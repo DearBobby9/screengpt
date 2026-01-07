@@ -1,0 +1,1820 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Alma - Elegant AI Provider Orchestration</title>
+        <meta
+            name="description"
+            content="Alma is an elegant desktop application for AI provider orchestration. Seamlessly manage multiple AI providers including OpenAI, Anthropic, Google Gemini, and custom APIs in one beautiful interface."
+        />
+        <meta name="keywords" content="AI, LLM, ChatGPT, Claude, Gemini, Desktop App, AI Provider, Electron" />
+        <meta name="author" content="Alma" />
+        <meta name="theme-color" content="#7299a0" />
+        <link rel="icon" type="image/png" href="assets/alma.png" />
+        <link rel="apple-touch-icon" href="assets/alma.png" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://alma.now/" />
+        <meta property="og:title" content="Alma - Elegant AI Provider Orchestration" />
+        <meta property="og:description" content="Alma is an elegant desktop application for AI provider orchestration. Seamlessly manage multiple AI providers including OpenAI, Anthropic, Google Gemini, and custom APIs in one beautiful interface." />
+        <meta property="og:image" content="https://alma.now/assets/og-image.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Alma" />
+        <meta property="og:locale" content="en_US" />
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content="https://alma.now/" />
+        <meta name="twitter:title" content="Alma - Elegant AI Provider Orchestration" />
+        <meta name="twitter:description" content="Alma is an elegant desktop application for AI provider orchestration. Seamlessly manage multiple AI providers including OpenAI, Anthropic, Google Gemini, and custom APIs in one beautiful interface." />
+        <meta name="twitter:image" content="https://alma.now/assets/og-image.png" />
+
+        <style>
+            @font-face {
+                font-family: 'Classico';
+                src: url('assets/classico-regular.otf') format('opentype');
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
+            }
+
+            @font-face {
+                font-family: 'Slabo 27px';
+                src: url('assets/Slabo27px-Regular.ttf') format('truetype');
+                font-weight: 400;
+                font-style: normal;
+                font-display: swap;
+            }
+
+            :root {
+                --primary: #7299a0;
+                --primary-dark: #61afef;
+                --background: #ffffff;
+                --background-dark: #282c34;
+                --foreground: #1a1a1a;
+                --foreground-dark: #dcdfe4;
+                --card: #f8fafc;
+                --card-dark: #21252b;
+                --border: #e2e8f0;
+                --border-dark: #3e4451;
+                --muted: #64748b;
+                --accent: #98c379;
+                --seiji-400: #7bc0ad;
+                --seiji-500: #5ba692;
+                --seiji-600: #488a77;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                scroll-behavior: smooth;
+            }
+
+            body {
+                font-family: 'Slabo 27px', Georgia, serif;
+                background: var(--background);
+                color: var(--foreground);
+                line-height: 1.6;
+                overflow-x: hidden;
+            }
+
+            body.dark {
+                background: var(--background-dark);
+                color: var(--foreground-dark);
+            }
+
+            ::selection {
+                background-color: rgba(114, 153, 160, 0.4);
+            }
+
+            body.dark ::selection {
+                background-color: rgba(97, 175, 239, 0.5);
+                color: #fff;
+            }
+
+            /* View Transitions API for theme toggle */
+            ::view-transition-old(root),
+            ::view-transition-new(root) {
+                animation: none;
+                mix-blend-mode: normal;
+            }
+
+            ::view-transition-old(root) {
+                z-index: 1;
+            }
+
+            ::view-transition-new(root) {
+                z-index: 999;
+            }
+
+            .dark::view-transition-old(root) {
+                z-index: 999;
+            }
+
+            .dark::view-transition-new(root) {
+                z-index: 1;
+            }
+
+            /* Navigation */
+            nav {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+                padding: 1rem 2rem;
+                background: rgba(255, 255, 255, 0.8);
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--border);
+                transition: all 0.3s ease;
+            }
+
+            body.dark nav {
+                background: rgba(40, 44, 52, 0.8);
+                border-bottom-color: var(--border-dark);
+            }
+
+            nav .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .logo {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                text-decoration: none;
+                color: inherit;
+            }
+
+            .logo img {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+            }
+
+            .logo span {
+                font-family: 'Classico', Georgia, 'Times New Roman', serif;
+                font-size: 1.5rem;
+                font-weight: 400;
+                letter-spacing: 0.02em;
+            }
+
+            .nav-links {
+                display: flex;
+                gap: 2rem;
+                align-items: center;
+            }
+
+            .nav-links a {
+                text-decoration: none;
+                color: var(--muted);
+                font-weight: 500;
+                transition: color 0.2s;
+            }
+
+            .nav-links a:hover {
+                color: var(--primary);
+            }
+
+            body.dark .nav-links a:hover {
+                color: var(--primary-dark);
+            }
+
+            .theme-toggle {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0.5rem;
+                border-radius: 8px;
+                color: var(--muted);
+                transition: all 0.2s;
+            }
+
+            .theme-toggle:hover {
+                background: var(--card);
+                color: var(--foreground);
+            }
+
+            body.dark .theme-toggle:hover {
+                background: var(--card-dark);
+                color: var(--foreground-dark);
+            }
+
+            /* Hero Section */
+            .hero {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 6rem 2rem 4rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .hero-content {
+                max-width: 900px;
+                text-align: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-icon {
+                width: 140px;
+                height: 140px;
+                margin: 0 auto 2rem;
+                border-radius: 32px;
+            }
+
+            .hero h1 {
+                font-family: 'Classico', Georgia, 'Times New Roman', serif;
+                font-size: clamp(2.5rem, 6vw, 4rem);
+                font-weight: 400;
+                letter-spacing: 0.02em;
+                margin-bottom: 1.5rem;
+                color: var(--foreground);
+            }
+
+            body.dark .hero h1 {
+                color: var(--foreground-dark);
+            }
+
+            .hero .tagline {
+                font-size: 1.25rem;
+                color: var(--muted);
+                max-width: 600px;
+                margin: 0 auto 2.5rem;
+            }
+
+            .hero-buttons {
+                display: flex;
+                gap: 1rem;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.625rem 1.25rem;
+                border-radius: 6px;
+                font-weight: 500;
+                font-size: 0.875rem;
+                text-decoration: none;
+                transition:
+                    background-color 0.15s ease,
+                    border-color 0.15s ease;
+                cursor: pointer;
+            }
+
+            .btn-primary {
+                background: var(--primary);
+                color: white;
+                border: 1px solid transparent;
+            }
+
+            .btn-primary:hover {
+                background: #628a90;
+            }
+
+            .btn-primary:active {
+                background: #5a7f85;
+            }
+
+            body.dark .btn-primary {
+                background: var(--primary-dark);
+                color: #0c111a;
+            }
+
+            body.dark .btn-primary:hover {
+                background: #7bb8e8;
+            }
+
+            body.dark .btn-primary:active {
+                background: #5a9fd4;
+            }
+
+            .btn-secondary {
+                background: transparent;
+                color: var(--foreground);
+                border: 1px solid var(--border);
+            }
+
+            .btn-secondary:hover {
+                border-color: #c0c8d0;
+                background: rgba(0, 0, 0, 0.02);
+            }
+
+            .btn-secondary:active {
+                background: rgba(0, 0, 0, 0.04);
+            }
+
+            body.dark .btn-secondary {
+                background: transparent;
+                color: var(--foreground-dark);
+                border-color: rgba(255, 255, 255, 0.15);
+            }
+
+            body.dark .btn-secondary:hover {
+                border-color: rgba(255, 255, 255, 0.25);
+                background: rgba(255, 255, 255, 0.04);
+            }
+
+            body.dark .btn-secondary:active {
+                background: rgba(255, 255, 255, 0.06);
+            }
+
+            .section-title {
+                text-align: center;
+                margin-bottom: 4rem;
+            }
+
+            .section-title h2 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-bottom: 1rem;
+            }
+
+            .section-title p {
+                color: var(--muted);
+                font-size: 1.125rem;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            /* Features Section */
+            .features {
+                padding: 6rem 2rem;
+                background: var(--card);
+            }
+
+            body.dark .features {
+                background: var(--card-dark);
+            }
+
+            .features-grid {
+                max-width: 1100px;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: 5rem;
+            }
+
+            .feature-item {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 3rem;
+                align-items: center;
+            }
+
+            .feature-item.reverse {
+                direction: rtl;
+            }
+
+            .feature-item.reverse > * {
+                direction: ltr;
+            }
+
+            .feature-content {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .feature-content h3 {
+                font-size: 1.75rem;
+                font-weight: 700;
+                letter-spacing: -0.01em;
+            }
+
+            .feature-content p {
+                color: var(--muted);
+                font-size: 1.0625rem;
+                line-height: 1.7;
+            }
+
+            .feature-image-wrapper {
+                position: relative;
+                border-radius: 16px;
+                overflow: hidden;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            }
+
+            .feature-image-wrapper:hover {
+                transform: scale(1.02);
+            }
+
+            /* Lightbox */
+            .lightbox-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                visibility: hidden;
+                transition:
+                    opacity 0.3s ease,
+                    visibility 0.3s ease;
+                cursor: zoom-out;
+            }
+
+            .lightbox-overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .lightbox-content {
+                max-width: 90vw;
+                max-height: 90vh;
+                border-radius: 12px;
+                transform: scale(0.9);
+                transition: transform 0.3s ease;
+            }
+
+            .lightbox-overlay.active .lightbox-content {
+                transform: scale(1);
+            }
+
+            .lightbox-close {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.1);
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.2s ease;
+            }
+
+            .lightbox-close:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .lightbox-close svg {
+                width: 20px;
+                height: 20px;
+                stroke: white;
+            }
+
+            .lightbox-nav {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 50px;
+                height: 50px;
+                background: rgba(255, 255, 255, 0.1);
+                border: none;
+                border-radius: 50%;
+                cursor: pointer;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                transition:
+                    background 0.2s ease,
+                    opacity 0.2s ease;
+            }
+
+            .lightbox-nav.visible {
+                display: flex;
+            }
+
+            .lightbox-nav:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .lightbox-nav svg {
+                width: 24px;
+                height: 24px;
+                stroke: white;
+            }
+
+            .lightbox-prev {
+                left: 20px;
+            }
+
+            .lightbox-next {
+                right: 20px;
+            }
+
+            .feature-image-wrapper img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            .feature-image-wrapper .light-img {
+                display: block;
+            }
+
+            .feature-image-wrapper .dark-img {
+                display: none;
+            }
+
+            body.dark .feature-image-wrapper .light-img {
+                display: none;
+            }
+
+            body.dark .feature-image-wrapper .dark-img {
+                display: block;
+            }
+
+            /* Image Carousel */
+            .feature-carousel {
+                position: relative;
+            }
+
+            .feature-carousel img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: auto;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.6s ease-in-out;
+            }
+
+            .feature-carousel img.light-img.active {
+                position: relative;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .feature-carousel img.dark-img {
+                display: none;
+            }
+
+            body.dark .feature-carousel img.light-img {
+                display: none;
+            }
+
+            body.dark .feature-carousel img.light-img.active {
+                position: absolute;
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            body.dark .feature-carousel img.dark-img {
+                display: block;
+            }
+
+            body.dark .feature-carousel img.dark-img.active {
+                position: relative;
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .carousel-dots {
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            }
+
+            .carousel-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--border);
+                border: none;
+                padding: 0;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .carousel-dot:hover {
+                background: var(--muted);
+            }
+
+            .carousel-dot.active {
+                background: var(--primary);
+                transform: scale(1.25);
+            }
+
+            body.dark .carousel-dot {
+                background: var(--border-dark);
+            }
+
+            body.dark .carousel-dot:hover {
+                background: var(--muted);
+            }
+
+            body.dark .carousel-dot.active {
+                background: var(--primary-dark);
+            }
+
+            @media (max-width: 900px) {
+                .feature-item {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+
+                .feature-item.reverse {
+                    direction: ltr;
+                }
+
+                .feature-content {
+                    text-align: center;
+                }
+            }
+
+            /* Providers Section */
+            .providers {
+                padding: 6rem 2rem;
+            }
+
+            .providers-logos {
+                max-width: 800px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: center;
+                gap: 3rem;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .provider-logo {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.75rem;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .provider-logo:hover {
+                opacity: 1;
+            }
+
+            .provider-logo svg {
+                width: 48px;
+                height: 48px;
+            }
+
+            .provider-logo span {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: var(--muted);
+            }
+
+            /* Installation Section */
+            .installation {
+                padding: 6rem 2rem;
+                background: var(--card);
+            }
+
+            body.dark .installation {
+                background: var(--card-dark);
+            }
+
+            .install-content {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .install-tabs {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 2rem;
+                justify-content: center;
+            }
+
+            .install-tab {
+                padding: 0.75rem 1.5rem;
+                border: none;
+                background: transparent;
+                border-radius: 8px;
+                font-weight: 500;
+                cursor: pointer;
+                color: var(--muted);
+                transition: all 0.2s;
+            }
+
+            .install-tab:hover {
+                background: var(--background);
+            }
+
+            body.dark .install-tab:hover {
+                background: var(--background-dark);
+            }
+
+            .install-tab.active {
+                background: var(--primary);
+                color: white;
+            }
+
+            body.dark .install-tab.active {
+                background: var(--primary-dark);
+                color: #0c111a;
+            }
+
+            .install-panel {
+                display: none;
+            }
+
+            .install-panel.active {
+                display: block;
+            }
+
+            .install-step {
+                background: var(--background);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 1.5rem;
+                margin-bottom: 1rem;
+            }
+
+            body.dark .install-step {
+                background: var(--background-dark);
+                border-color: var(--border-dark);
+            }
+
+            .install-step h4 {
+                font-size: 1rem;
+                font-weight: 600;
+                margin-bottom: 0.75rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .install-step a {
+                color: var(--primary);
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+                transition: border-color 0.2s;
+            }
+
+            .install-step a:hover {
+                border-bottom-color: var(--primary);
+            }
+
+            body.dark .install-step a {
+                color: var(--primary-dark);
+            }
+
+            body.dark .install-step a:hover {
+                border-bottom-color: var(--primary-dark);
+            }
+
+            .step-number {
+                width: 24px;
+                height: 24px;
+                background: var(--primary);
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                font-weight: 700;
+            }
+
+            body.dark .step-number {
+                background: var(--primary-dark);
+                color: #0c111a;
+            }
+
+            .code-block {
+                background: #1e1e1e;
+                color: #d4d4d4;
+                padding: 1rem;
+                border-radius: 8px;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+                font-size: 0.875rem;
+                overflow-x: auto;
+            }
+
+            .code-block code {
+                color: inherit;
+            }
+
+            .code-block .comment {
+                color: #6a9955;
+            }
+
+            .code-block .command {
+                color: #dcdcaa;
+            }
+
+            /* Download Section */
+            .download {
+                padding: 6rem 2rem;
+                background: var(--card);
+            }
+
+            body.dark .download {
+                background: var(--card-dark);
+            }
+
+            .version-badge {
+                display: inline-block;
+                background: var(--primary);
+                color: white;
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                margin-left: 0.5rem;
+            }
+
+            body.dark .version-badge {
+                background: var(--primary-dark);
+                color: #0c111a;
+            }
+
+            .download-grid {
+                max-width: 900px;
+                margin: 0 auto;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+
+            @media (max-width: 768px) {
+                .download-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .download-card {
+                background: var(--background);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 1.75rem;
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                transition: all 0.2s ease;
+            }
+
+            body.dark .download-card {
+                background: var(--background-dark);
+                border-color: var(--border-dark);
+            }
+
+            .download-card:hover {
+                border-color: var(--primary);
+            }
+
+            body.dark .download-card:hover {
+                border-color: var(--primary-dark);
+            }
+
+            .download-card-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .platform-icon {
+                width: 32px;
+                height: 32px;
+                color: var(--foreground);
+                opacity: 0.8;
+            }
+
+            body.dark .platform-icon {
+                color: var(--foreground-dark);
+            }
+
+            .download-card-header h3 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            .download-options {
+                display: flex;
+                flex-direction: column;
+                gap: 0.625rem;
+            }
+
+            .download-btn {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.75rem 1rem;
+                background: var(--secondary);
+                color: var(--secondary-foreground);
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 0.875rem;
+                transition: all 0.2s ease;
+            }
+
+            .download-btn:hover {
+                background: var(--border);
+            }
+
+            body.dark .download-btn {
+                background: var(--secondary);
+                color: var(--secondary-foreground);
+            }
+
+            body.dark .download-btn:hover {
+                background: var(--border-dark);
+            }
+
+            .download-btn[data-loading='true'] {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            .btn-arch {
+                font-weight: 600;
+            }
+
+            .btn-ext {
+                opacity: 0.7;
+                font-weight: 400;
+                font-family: 'SF Mono', Monaco, monospace;
+                font-size: 0.8rem;
+            }
+
+            .download-note {
+                text-align: center;
+                margin-top: 2rem;
+                color: var(--muted);
+                font-size: 0.875rem;
+            }
+
+            .download-note a {
+                color: var(--primary);
+                text-decoration: none;
+            }
+
+            .download-note a:hover {
+                text-decoration: underline;
+            }
+
+            body.dark .download-note a {
+                color: var(--primary-dark);
+            }
+
+            .download-card-disabled {
+                opacity: 0.6;
+            }
+
+            .download-card-disabled:hover {
+                border-color: var(--border);
+            }
+
+            body.dark .download-card-disabled:hover {
+                border-color: var(--border-dark);
+            }
+
+            .download-btn-disabled {
+                cursor: not-allowed;
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            .platform-notice {
+                font-size: 0.8rem;
+                color: var(--muted);
+                text-align: center;
+                margin-top: -0.5rem;
+                font-style: italic;
+            }
+
+            /* Coming Soon Overlay */
+            .download-card-coming-soon {
+                position: relative;
+            }
+
+            .coming-soon-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(40, 44, 52, 0.6);
+                backdrop-filter: blur(2px);
+                border-radius: 16px;
+                z-index: 10;
+            }
+
+            body:not(.dark) .coming-soon-overlay {
+                background: rgba(248, 250, 252, 0.6);
+            }
+
+            .coming-soon-text {
+                font-size: 1.1rem;
+                font-weight: 600;
+                font-style: italic;
+                color: var(--muted);
+            }
+
+            /* Download note highlight animation */
+            .download-note-animated {
+                display: inline;
+            }
+
+            .download-note-animated .highlight-word {
+                display: inline;
+                transition:
+                    color 0.2s ease,
+                    text-shadow 0.2s ease;
+            }
+
+            .download-note-animated .highlight-word.active {
+                color: var(--primary);
+                text-shadow: 0 0 8px rgba(114, 153, 160, 0.4);
+            }
+
+            body.dark .download-note-animated .highlight-word.active {
+                color: var(--primary-dark);
+                text-shadow: 0 0 8px rgba(97, 175, 239, 0.4);
+            }
+
+            /* Footer */
+            footer {
+                padding: 4rem 2rem;
+                border-top: 1px solid var(--border);
+                text-align: center;
+            }
+
+            body.dark footer {
+                border-top-color: var(--border-dark);
+            }
+
+            footer .logo {
+                justify-content: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .footer-links {
+                display: flex;
+                gap: 2rem;
+                justify-content: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .footer-links a {
+                color: var(--muted);
+                text-decoration: none;
+                font-size: 0.875rem;
+                transition: color 0.2s;
+            }
+
+            .footer-links a:hover {
+                color: var(--primary);
+            }
+
+            body.dark .footer-links a:hover {
+                color: var(--primary-dark);
+            }
+
+            .copyright {
+                color: var(--muted);
+                font-size: 0.875rem;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                nav {
+                    padding: 1rem;
+                }
+
+                .nav-links {
+                    display: none;
+                }
+
+                .hero {
+                    padding: 5rem 1.5rem 3rem;
+                }
+
+                .hero-icon {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 24px;
+                }
+
+                .features,
+                .providers,
+                .installation {
+                    padding: 4rem 1.5rem;
+                }
+
+                .providers-logos {
+                    gap: 2rem;
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+            }
+
+            /* Animations */
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .animate-in {
+                animation: fadeInUp 0.6s ease forwards;
+            }
+
+            .delay-1 {
+                animation-delay: 0.1s;
+            }
+            .delay-2 {
+                animation-delay: 0.2s;
+            }
+            .delay-3 {
+                animation-delay: 0.3s;
+            }
+            .delay-4 {
+                animation-delay: 0.4s;
+            }
+        </style>
+    </head>
+    <body>
+        <nav>
+            <div class="container">
+                <a href="#" class="logo">
+                    <img src="assets/alma.png" alt="Alma" />
+                    <span>Alma</span>
+                </a>
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#providers">Providers</a>
+                    <a href="#download">Download</a>
+                    <a href="/docs">Docs</a>
+                    <a href="https://discord.gg/h5brCvjVDM" target="_blank">Discord</a>
+                    <a href="https://feedback.alma.now" target="_blank">Feedback</a>
+                    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5" />
+                            <line x1="12" y1="1" x2="12" y2="3" />
+                            <line x1="12" y1="21" x2="12" y2="23" />
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                            <line x1="1" y1="12" x2="3" y2="12" />
+                            <line x1="21" y1="12" x2="23" y2="12" />
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hero">
+            <div class="hero-content">
+                <img src="assets/alma.png" alt="Alma App Icon" class="hero-icon animate-in" />
+                <h1 class="animate-in delay-1">Elegant AI Provider Orchestration</h1>
+                <p class="tagline animate-in delay-2">
+                    A beautiful desktop application that unifies your AI experience. Seamlessly switch between OpenAI, Anthropic, Google Gemini, and custom
+                    providers.
+                </p>
+                <div class="hero-buttons animate-in delay-3">
+                    <a href="#download" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Download
+                    </a>
+                    <a href="https://discord.gg/h5brCvjVDM" target="_blank" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                        </svg>
+                        Discord
+                    </a>
+                    <a href="https://feedback.alma.now" target="_blank" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                        Feedback
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="section-title">
+                <h2>Powerful Features</h2>
+                <p>Everything you need for a seamless AI experience in one elegant interface.</p>
+            </div>
+            <div class="features-grid">
+                <!-- Chat -->
+                <div class="feature-item">
+                    <div class="feature-content">
+                        <h3>Beautiful Chat Interface</h3>
+                        <p>
+                            Engage in natural conversations with AI through a clean, intuitive chat interface. Supports markdown rendering, code highlighting,
+                            and seamless streaming responses.
+                        </p>
+                    </div>
+                    <div class="feature-image-wrapper">
+                        <img src="assets/features/chat.png" alt="Chat Interface" class="light-img" />
+                        <img src="assets/features/chat-dark.png" alt="Chat Interface" class="dark-img" />
+                    </div>
+                </div>
+
+                <!-- Memory -->
+                <div class="feature-item reverse">
+                    <div class="feature-content">
+                        <h3>Intelligent Memory</h3>
+                        <p>
+                            Alma remembers your preferences and context across conversations. Build a personalized AI assistant that truly understands you over
+                            time.
+                        </p>
+                    </div>
+                    <div>
+                        <div class="feature-image-wrapper feature-carousel" id="memory-carousel">
+                            <img src="assets/features/memory.png" alt="Memory Feature" class="light-img active" data-group="0" />
+                            <img src="assets/features/use-memory.png" alt="Use Memory" class="light-img" data-group="1" />
+                            <img src="assets/features/update-memory.png" alt="Update Memory" class="light-img" data-group="2" />
+                            <img src="assets/features/memory-dark.png" alt="Memory Feature" class="dark-img active" data-group="0" />
+                            <img src="assets/features/use-memory-dark.png" alt="Use Memory" class="dark-img" data-group="1" />
+                            <img src="assets/features/update-memory-dark.png" alt="Update Memory" class="dark-img" data-group="2" />
+                        </div>
+                        <div class="carousel-dots" id="memory-carousel-dots">
+                            <button class="carousel-dot active" data-index="0" aria-label="View memory feature"></button>
+                            <button class="carousel-dot" data-index="1" aria-label="View use memory"></button>
+                            <button class="carousel-dot" data-index="2" aria-label="View update memory"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory List -->
+                <div class="feature-item">
+                    <div class="feature-content">
+                        <h3>Memory Management</h3>
+                        <p>
+                            View, organize, and manage all your stored memories in one place. Full control over what Alma remembers about you and your
+                            preferences.
+                        </p>
+                    </div>
+                    <div class="feature-image-wrapper">
+                        <img src="assets/features/memory-list.png" alt="Memory List" class="light-img" />
+                        <img src="assets/features/memory-list-dark.png" alt="Memory List" class="dark-img" />
+                    </div>
+                </div>
+
+                <!-- Web Search -->
+                <div class="feature-item reverse">
+                    <div class="feature-content">
+                        <h3>Web Search Integration</h3>
+                        <p>
+                            Access real-time information from the web. Alma can search and retrieve up-to-date data to provide accurate, current answers to your
+                            questions.
+                        </p>
+                    </div>
+                    <div class="feature-image-wrapper">
+                        <img src="assets/features/web-search.png" alt="Web Search" class="light-img" />
+                        <img src="assets/features/web-search-dark.png" alt="Web Search" class="dark-img" />
+                    </div>
+                </div>
+
+                <!-- Tool Use -->
+                <div class="feature-item">
+                    <div class="feature-content">
+                        <h3>Advanced Tool Use</h3>
+                        <p>
+                            Leverage AI's ability to use tools and perform complex tasks. From calculations to data analysis, extend what's possible with
+                            intelligent tool integration.
+                        </p>
+                    </div>
+                    <div class="feature-image-wrapper">
+                        <img src="assets/features/tool-use.png" alt="Tool Use" class="light-img" />
+                        <img src="assets/features/tool-use-dark.png" alt="Tool Use" class="dark-img" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="providers" id="providers">
+            <div class="section-title">
+                <h2>Supported Providers</h2>
+                <p>Connect to your favorite AI providers with a unified interface.</p>
+            </div>
+            <div class="providers-logos">
+                <div class="provider-logo">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364l2.0201-1.1685a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"
+                        />
+                    </svg>
+                    <span>OpenAI</span>
+                </div>
+                <div class="provider-logo">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            fill-rule="evenodd"
+                            d="M9.218 2h2.402L16 12.987h-2.402zM4.379 2h2.512l4.38 10.987H8.82l-.895-2.308h-4.58l-.896 2.307H0L4.38 2.001zm2.755 6.64L5.635 4.777 4.137 8.64z"
+                        />
+                    </svg>
+                    <span>Anthropic</span>
+                </div>
+                <div class="provider-logo">
+                    <svg viewBox="0 0 65 65" fill="currentColor">
+                        <path
+                            d="M32.447 0c.68 0 1.273.465 1.439 1.125a38.904 38.904 0 001.999 5.905c2.152 5 5.105 9.376 8.854 13.125 3.751 3.75 8.126 6.703 13.125 8.855a38.98 38.98 0 005.906 1.999c.66.166 1.124.758 1.124 1.438 0 .68-.464 1.273-1.125 1.439a38.902 38.902 0 00-5.905 1.999c-5 2.152-9.375 5.105-13.125 8.854-3.749 3.751-6.702 8.126-8.854 13.125a38.973 38.973 0 00-2 5.906 1.485 1.485 0 01-1.438 1.124c-.68 0-1.272-.464-1.438-1.125a38.913 38.913 0 00-2-5.905c-2.151-5-5.103-9.375-8.854-13.125-3.75-3.749-8.125-6.702-13.125-8.854a38.973 38.973 0 00-5.905-2A1.485 1.485 0 010 32.448c0-.68.465-1.272 1.125-1.438a38.903 38.903 0 005.905-2c5-2.151 9.376-5.104 13.125-8.854 3.75-3.749 6.703-8.125 8.855-13.125a38.972 38.972 0 001.999-5.905A1.485 1.485 0 0132.447 0z"
+                        />
+                    </svg>
+                    <span>Google Gemini</span>
+                </div>
+                <div class="provider-logo">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.748 4.482c-.254-.124-.364.113-.512.234-.051.039-.094.09-.137.136-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.156-.708-.311-.955-.65-.172-.241-.219-.51-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.093.172.187.129.323-.082.28-.18.552-.266.833-.055.179-.137.217-.329.14a5.526 5.526 0 01-1.736-1.18c-.857-.828-1.631-1.742-2.597-2.458a11.365 11.365 0 00-.689-.471c-.985-.957.13-1.743.388-1.836.27-.098.093-.432-.779-.428-.872.004-1.67.295-2.687.684a3.055 3.055 0 01-.465.137 9.597 9.597 0 00-2.883-.102c-1.885.21-3.39 1.102-4.497 2.623C.082 8.606-.231 10.684.152 12.85c.403 2.284 1.569 4.175 3.36 5.653 1.858 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.133-.284 4.994-1.86.47.234.962.327 1.78.397.63.059 1.236-.03 1.705-.128.735-.156.684-.837.419-.961-2.155-1.004-1.682-.595-2.113-.926 1.096-1.296 2.746-2.642 3.392-7.003.05-.347.007-.565 0-.845-.004-.17.035-.237.23-.256a4.173 4.173 0 001.545-.475c1.396-.763 1.96-2.015 2.093-3.517.02-.23-.004-.467-.247-.588zM11.581 18c-2.089-1.642-3.102-2.183-3.52-2.16-.392.024-.321.471-.235.763.09.288.207.486.371.739.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.167-1.361-.802-2.5-1.86-3.301-3.307-.774-1.393-1.224-2.887-1.298-4.482-.02-.386.093-.522.477-.592a4.696 4.696 0 011.529-.039c2.132.312 3.946 1.265 5.468 2.774.868.86 1.525 1.887 2.202 2.891.72 1.066 1.494 2.082 2.48 2.914.348.292.625.514.891.677-.802.09-2.14.11-3.054-.614zm1-6.44a.306.306 0 01.415-.287.302.302 0 01.2.288.306.306 0 01-.31.307.303.303 0 01-.304-.308zm3.11 1.596c-.2.081-.399.151-.59.16a1.245 1.245 0 01-.798-.254c-.274-.23-.47-.358-.552-.758a1.73 1.73 0 01.016-.588c.07-.327-.008-.537-.239-.727-.187-.156-.426-.199-.688-.199a.559.559 0 01-.254-.078c-.11-.054-.2-.19-.114-.358.028-.054.16-.186.192-.21.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.391.451.462.576.685.914.176.265.336.537.445.848.067.195-.019.354-.25.452z"/>
+                    </svg>
+                    <span>DeepSeek</span>
+                </div>
+                <div class="provider-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    <span>Custom APIs</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="download" id="download">
+            <div class="section-title">
+                <h2>Download</h2>
+                <p>Get started with Alma in seconds. <span class="version-badge" id="version-badge">Loading...</span></p>
+            </div>
+            <div class="download-grid" id="download-grid">
+                <!-- macOS -->
+                <div class="download-card">
+                    <div class="download-card-header">
+                        <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+                            />
+                        </svg>
+                        <h3>macOS</h3>
+                    </div>
+                    <div class="download-options">
+                        <a href="javascript:void(0)" class="download-btn" id="mac-arm64-dmg" data-loading="true">
+                            <span class="btn-arch">Apple Silicon</span>
+                            <span class="btn-ext">.dmg</span>
+                        </a>
+                        <a href="javascript:void(0)" class="download-btn" id="mac-x64-dmg" data-loading="true">
+                            <span class="btn-arch">Intel</span>
+                            <span class="btn-ext">.dmg</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Windows -->
+                <div class="download-card">
+                    <div class="download-card-header">
+                        <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 12V6.75l6-1.32v6.48L3 12zm0 .75l6 .09v6.81l-6-1.07V12.75zM10 5.43V12h11V3L10 5.43zm0 13.57V19l11 2V12H10v7z" />
+                        </svg>
+                        <h3>Windows</h3>
+                    </div>
+                    <div class="download-options">
+                        <a href="javascript:void(0)" class="download-btn" id="win-x64-exe" data-loading="true">
+                            <span class="btn-arch">x64</span>
+                            <span class="btn-ext">.exe</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Linux -->
+                <div class="download-card download-card-coming-soon" data-coming-soon>
+                    <div class="download-card-header">
+                        <svg class="platform-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12.504 0c-.155 0-.311.001-.465.003-.653.014-1.294.106-1.907.311-.6.206-1.166.489-1.68.838-.514.349-.972.766-1.362 1.234-.39.468-.708.98-.948 1.523-.24.543-.401 1.114-.482 1.701-.081.587-.084 1.18-.009 1.764.075.584.227 1.148.448 1.678.221.53.509 1.022.856 1.464.347.442.746.834 1.189 1.168.443.334.924.606 1.433.81.509.204 1.041.339 1.584.4.543.061 1.093.048 1.63-.04.537-.088 1.055-.25 1.541-.48.486-.23.937-.526 1.339-.878.402-.352.752-.758 1.039-1.206.287-.448.508-.935.655-1.448.147-.513.22-1.05.214-1.59-.006-.54-.09-1.072-.252-1.58-.162-.508-.398-.984-.697-1.418-.299-.434-.658-.82-1.065-1.15-.407-.33-.858-.598-1.34-.798-.482-.2-.991-.33-1.513-.388-.522-.058-1.052-.044-1.569.042-.517.086-1.013.242-1.475.464-.462.222-.887.508-1.265.848-.378.34-.707.732-.977 1.166-.27.434-.479.906-.617 1.4-.138.494-.205 1.008-.201 1.526.004.518.08 1.028.227 1.516.147.488.362.948.639 1.37.277.422.613.804.999 1.138.386.334.816.62 1.281.85.465.23.961.402 1.475.512.514.11 1.043.156 1.572.136.529-.02 1.048-.106 1.544-.256.496-.15.965-.362 1.396-.632.431-.27.82-.596 1.159-.968.339-.372.624-.788.851-1.238.227-.45.394-.932.499-1.434.105-.502.148-1.018.128-1.536-.02-.518-.103-1.028-.247-1.514-.144-.486-.35-.946-.61-1.368-.26-.422-.572-.806-.927-1.144-.355-.338-.75-.632-1.177-.874-.427-.242-.883-.434-1.359-.57-.476-.136-.969-.218-1.471-.242-.502-.024-1.01.01-1.511.1z"
+                            />
+                        </svg>
+                        <h3>Linux</h3>
+                    </div>
+                    <div class="download-options">
+                        <div class="download-btn download-btn-disabled">
+                            <span class="btn-arch">x64</span>
+                            <span class="btn-ext">.AppImage</span>
+                        </div>
+                        <div class="download-btn download-btn-disabled">
+                            <span class="btn-arch">x64</span>
+                            <span class="btn-ext">.deb</span>
+                        </div>
+                    </div>
+                    <div class="coming-soon-overlay">
+                        <span class="coming-soon-text">Coming soon</span>
+                    </div>
+                </div>
+            </div>
+            <p class="download-note" id="download-note" style="margin-top: 2rem">
+                Currently, Alma has only been tested on macOS with Apple Silicon (M-series chips).<br />
+                Linux support will be available soon after cross-platform compatibility testing.
+            </p>
+        </section>
+
+        <!-- Lightbox -->
+        <div class="lightbox-overlay" id="lightbox">
+            <button class="lightbox-close" aria-label="Close lightbox">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+            <button class="lightbox-nav lightbox-prev" aria-label="Previous image">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6" />
+                </svg>
+            </button>
+            <img class="lightbox-content" id="lightbox-img" src="" alt="" />
+            <button class="lightbox-nav lightbox-next" aria-label="Next image">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" />
+                </svg>
+            </button>
+        </div>
+
+        <footer>
+            <a href="#" class="logo">
+                <img src="assets/alma.png" alt="Alma" />
+                <span>Alma</span>
+            </a>
+            <div class="footer-links">
+                <a href="/docs">Docs</a>
+                <a href="https://discord.gg/h5brCvjVDM" target="_blank">Discord</a>
+                <a href="https://feedback.alma.now" target="_blank">Feedback</a>
+            </div>
+            <p class="copyright">
+                &copy; 2025 Alma. Made with love by <a href="https://github.com/yetone" target="_blank" style="color: var(--primary)">yetone</a>
+            </p>
+        </footer>
+
+        <script>
+            // Theme toggle with View Transitions API
+            function toggleTheme() {
+                const isDark = document.body.classList.contains('dark');
+                const targetTheme = isDark ? 'light' : 'dark';
+
+                // Check if View Transitions API is supported
+                if (!document.startViewTransition) {
+                    // Fallback for unsupported browsers
+                    document.body.classList.toggle('dark');
+                    localStorage.setItem('theme', targetTheme);
+                    return;
+                }
+
+                // Use View Transitions API with circle clip-path animation
+                const transition = document.startViewTransition(() => {
+                    document.body.classList.toggle('dark');
+                    localStorage.setItem('theme', targetTheme);
+                });
+
+                // Animate with clip-path from top-left corner
+                transition.ready.then(() => {
+                    const clipStart = 'circle(0% at 0 0)';
+                    const clipEnd = 'circle(150% at 0 0)';
+
+                    // New theme reveals from top-left
+                    document.documentElement.animate(
+                        { clipPath: [clipStart, clipEnd] },
+                        {
+                            duration: 1200,
+                            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                            pseudoElement: '::view-transition-new(root)',
+                        }
+                    );
+                });
+            }
+
+            // Load saved theme
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark');
+            }
+
+            // Fetch download links from updates API
+            const BASE_URL = 'https://updates.alma.now';
+
+            async function fetchDownloadInfo() {
+                try {
+                    const [macRes, winRes, linuxRes] = await Promise.all([
+                        fetch(`${BASE_URL}/latest-mac.yml`),
+                        fetch(`${BASE_URL}/latest.yml`),
+                        fetch(`${BASE_URL}/latest-linux.yml`),
+                    ]);
+
+                    const [macYaml, winYaml, linuxYaml] = await Promise.all([macRes.text(), winRes.text(), linuxRes.text()]);
+
+                    // Parse version
+                    const version = macYaml.match(/^version:\s*(.+)$/m)?.[1]?.trim();
+                    if (version) {
+                        document.getElementById('version-badge').textContent = `v${version}`;
+                    }
+
+                    // Parse files from yml
+                    const parseFiles = yaml => {
+                        const files = [];
+                        for (const line of yaml.split('\n')) {
+                            const match = line.match(/^\s*-\s*url:\s*(.+)$/);
+                            if (match) files.push(match[1].trim());
+                        }
+                        return files;
+                    };
+
+                    const macFiles = parseFiles(macYaml);
+                    const winFiles = parseFiles(winYaml);
+                    const linuxFiles = parseFiles(linuxYaml);
+
+                    // Update download buttons
+                    const setLink = (id, filename) => {
+                        const btn = document.getElementById(id);
+                        if (btn && filename) {
+                            btn.href = `${BASE_URL}/${filename}`;
+                            btn.removeAttribute('data-loading');
+                        }
+                    };
+
+                    setLink(
+                        'mac-arm64-dmg',
+                        macFiles.find(f => f.includes('arm64') && f.endsWith('.dmg'))
+                    );
+                    setLink(
+                        'mac-x64-dmg',
+                        macFiles.find(f => f.includes('x64') && f.endsWith('.dmg'))
+                    );
+                    setLink(
+                        'win-x64-exe',
+                        winFiles.find(f => f.endsWith('.exe'))
+                    );
+                    setLink(
+                        'linux-appimage',
+                        linuxFiles.find(f => f.endsWith('.AppImage'))
+                    );
+                    setLink(
+                        'linux-deb',
+                        linuxFiles.find(f => f.endsWith('.deb'))
+                    );
+                } catch (error) {
+                    console.error('Failed to fetch download info:', error);
+                    document.getElementById('version-badge').textContent = 'Latest';
+                    document.querySelectorAll('.download-btn').forEach(btn => {
+                        btn.href = 'https://github.com/yetone/alma-releases/releases/latest';
+                        btn.removeAttribute('data-loading');
+                    });
+                }
+            }
+
+            fetchDownloadInfo();
+
+            // Memory carousel
+            (function () {
+                const carousel = document.getElementById('memory-carousel');
+                const dotsContainer = document.getElementById('memory-carousel-dots');
+                if (!carousel || !dotsContainer) return;
+
+                const dots = dotsContainer.querySelectorAll('.carousel-dot');
+
+                function switchTo(index) {
+                    carousel.querySelectorAll('img.active').forEach(img => {
+                        img.classList.remove('active');
+                    });
+                    carousel.querySelectorAll(`[data-group="${index}"]`).forEach(img => {
+                        img.classList.add('active');
+                    });
+
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
+                }
+
+                dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => switchTo(index));
+                });
+            })();
+
+            // Lightbox functionality
+            (function () {
+                const lightbox = document.getElementById('lightbox');
+                const lightboxImg = document.getElementById('lightbox-img');
+                const closeBtn = lightbox.querySelector('.lightbox-close');
+                const prevBtn = lightbox.querySelector('.lightbox-prev');
+                const nextBtn = lightbox.querySelector('.lightbox-next');
+                const featureImages = document.querySelectorAll('.feature-image-wrapper');
+
+                let currentCarousel = null;
+                let currentIndex = 0;
+                let carouselImages = [];
+
+                function getCarouselImages(carousel) {
+                    const isDark = document.body.classList.contains('dark');
+                    const selector = isDark ? '.dark-img' : '.light-img';
+                    return Array.from(carousel.querySelectorAll(selector));
+                }
+
+                function updateNavButtons() {
+                    if (currentCarousel && carouselImages.length > 1) {
+                        prevBtn.classList.add('visible');
+                        nextBtn.classList.add('visible');
+                    } else {
+                        prevBtn.classList.remove('visible');
+                        nextBtn.classList.remove('visible');
+                    }
+                }
+
+                function showImage(index) {
+                    if (carouselImages.length === 0) return;
+                    currentIndex = (index + carouselImages.length) % carouselImages.length;
+                    const img = carouselImages[currentIndex];
+                    lightboxImg.src = img.src;
+                    lightboxImg.alt = img.alt;
+                }
+
+                function openLightbox(imgSrc, imgAlt, carousel = null, index = 0) {
+                    currentCarousel = carousel;
+                    if (carousel) {
+                        carouselImages = getCarouselImages(carousel);
+                        currentIndex = index;
+                    } else {
+                        carouselImages = [];
+                        currentIndex = 0;
+                    }
+
+                    lightboxImg.src = imgSrc;
+                    lightboxImg.alt = imgAlt;
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    updateNavButtons();
+                }
+
+                function closeLightbox() {
+                    lightbox.classList.remove('active');
+                    document.body.style.overflow = '';
+                    currentCarousel = null;
+                    carouselImages = [];
+                }
+
+                featureImages.forEach(wrapper => {
+                    wrapper.addEventListener('click', e => {
+                        // Don't trigger for carousel dots
+                        if (e.target.closest('.carousel-dots')) return;
+
+                        const isDark = document.body.classList.contains('dark');
+                        const isCarousel = wrapper.classList.contains('feature-carousel');
+
+                        let img;
+                        let index = 0;
+                        if (isCarousel) {
+                            img = wrapper.querySelector(isDark ? '.dark-img.active' : '.light-img.active');
+                            if (img) {
+                                index = parseInt(img.dataset.group) || 0;
+                            }
+                        } else {
+                            img = wrapper.querySelector(isDark ? '.dark-img' : '.light-img');
+                        }
+
+                        if (img && img.src) {
+                            openLightbox(img.src, img.alt, isCarousel ? wrapper : null, index);
+                        }
+                    });
+                });
+
+                prevBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    showImage(currentIndex - 1);
+                });
+
+                nextBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    showImage(currentIndex + 1);
+                });
+
+                closeBtn.addEventListener('click', closeLightbox);
+                lightbox.addEventListener('click', e => {
+                    if (e.target === lightbox) closeLightbox();
+                });
+
+                document.addEventListener('keydown', e => {
+                    if (!lightbox.classList.contains('active')) return;
+
+                    if (e.key === 'Escape') {
+                        closeLightbox();
+                    } else if (e.key === 'ArrowLeft' && carouselImages.length > 1) {
+                        showImage(currentIndex - 1);
+                    } else if (e.key === 'ArrowRight' && carouselImages.length > 1) {
+                        showImage(currentIndex + 1);
+                    }
+                });
+            })();
+
+            // Smooth scroll for anchor links (exclude download buttons)
+            document.querySelectorAll('a[href^="#"]:not(.download-btn)').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href && href.length > 1 && href.startsWith('#')) {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+                });
+            });
+
+            // Coming soon hover animation
+            (function () {
+                const downloadNote = document.getElementById('download-note');
+                const comingSoonCards = document.querySelectorAll('[data-coming-soon]');
+                if (!downloadNote || comingSoonCards.length === 0) return;
+
+                // Wrap words in spans for animation
+                const originalHTML = downloadNote.innerHTML;
+                const lines = originalHTML.split('<br>');
+                const wrappedLines = lines.map(line => {
+                    const words = line.split(/(\s+)/);
+                    return words
+                        .map(word => {
+                            if (word.trim() === '') return word;
+                            return `<span class="highlight-word">${word}</span>`;
+                        })
+                        .join('');
+                });
+                downloadNote.innerHTML = wrappedLines.join('<br>');
+
+                const highlightWords = downloadNote.querySelectorAll('.highlight-word');
+                let animationTimeout = null;
+
+                function animateHighlight() {
+                    if (animationTimeout) clearTimeout(animationTimeout);
+
+                    highlightWords.forEach(word => word.classList.remove('active'));
+
+                    let index = 0;
+                    const delay = 50;
+
+                    function highlightNext() {
+                        if (index > 0) {
+                            highlightWords[index - 1].classList.remove('active');
+                        }
+                        if (index < highlightWords.length) {
+                            highlightWords[index].classList.add('active');
+                            index++;
+                            animationTimeout = setTimeout(highlightNext, delay);
+                        } else {
+                            // Remove last highlight after animation completes
+                            setTimeout(() => {
+                                highlightWords[highlightWords.length - 1].classList.remove('active');
+                            }, delay);
+                        }
+                    }
+
+                    highlightNext();
+                }
+
+                function stopAnimation() {
+                    if (animationTimeout) {
+                        clearTimeout(animationTimeout);
+                        animationTimeout = null;
+                    }
+                    highlightWords.forEach(word => word.classList.remove('active'));
+                }
+
+                comingSoonCards.forEach(card => {
+                    card.addEventListener('mouseenter', animateHighlight);
+                    card.addEventListener('mouseleave', stopAnimation);
+                });
+            })();
+        </script>
+    </body>
+</html>
