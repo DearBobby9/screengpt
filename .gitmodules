@@ -1,0 +1,3 @@
+[submodule "nextchat"]
+	path = nextchat
+	url = https://github.com/ChatGPTNextWeb/ChatGPT-Next-Web.git

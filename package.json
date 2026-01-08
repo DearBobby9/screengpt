@@ -1,39 +1,15 @@
 {
-  "name": "usersbobbyjiadesktoppersonal_projectscreengpt",
+  "name": "screengpt",
   "private": true,
   "version": "0.1.0",
-  "type": "module",
+  "description": "A lightweight macOS desktop AI assistant with screenshot and vision capabilities",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "tauri": "tauri"
-  },
-  "dependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-global-shortcut": "^2.3.1",
-    "@tauri-apps/plugin-opener": "^2",
-    "@types/react-syntax-highlighter": "^15.5.13",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.24.10",
-    "lucide-react": "^0.562.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-draggable": "^4.5.0",
-    "react-markdown": "^10.1.0",
-    "react-syntax-highlighter": "^16.1.0",
-    "zustand": "^5.0.9"
+    "setup": "cd nextchat && npm install",
+    "dev": "cd src-tauri && cargo tauri dev",
+    "build": "cd src-tauri && cargo tauri build",
+    "tauri": "cd src-tauri && cargo tauri"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
-    "autoprefixer": "^10.4.23",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.18",
-    "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "@tauri-apps/cli": "^2"
   }
 }

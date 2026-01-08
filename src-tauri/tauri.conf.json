@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "identifier": "com.screengpt.app",
   "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "beforeDevCommand": "npm run --prefix nextchat export:dev",
+    "devUrl": "http://localhost:3000",
+    "beforeBuildCommand": "npm run --prefix nextchat export",
+    "frontendDist": "../nextchat/out"
   },
   "app": {
     "withGlobalTauri": true,
@@ -15,18 +15,21 @@
       {
         "label": "main",
         "title": "ScreenGPT",
-        "width": 500,
+        "width": 960,
         "height": 700,
-        "minWidth": 400,
+        "minWidth": 600,
         "minHeight": 500,
         "center": true,
         "visible": true,
         "decorations": true,
-        "resizable": true
+        "resizable": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob:; script-src 'self'; style-src 'self' 'unsafe-inline'"
+      "csp": null,
+      "dangerousDisableAssetCspModification": true
     }
   },
   "bundle": {
